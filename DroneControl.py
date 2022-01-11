@@ -25,12 +25,12 @@ class FrontEnd(object):
             - W and S: Up and down.
         保持Tello画面显示并用键盘移动它
         按下ESC键退出
-        操作说明：
-            T：起飞
-            L：降落
-            方向键：前后左右
-            A和D：逆时针与顺时针转向
-            W和S：上升与下降
+        操作说明:
+            T:     起飞
+            L:     降落
+            方向键: 前后左右
+            A和D:  逆时针与顺时针转向
+            W和S:  上升与下降
     """
 
     def __init__(self):
@@ -118,8 +118,8 @@ class FrontEnd(object):
         Arguments:
             key: pygame key
         基于键的按下上传各个方向的速度
-        参数：
-            key：pygame事件循环中的键事件
+        参数:
+            key: pygame事件循环中的键事件
         """
         if key == pygame.K_UP:  # set forward velocity
             self.for_back_velocity = S
@@ -143,8 +143,8 @@ class FrontEnd(object):
         Arguments:
             key: pygame key
         基于键的松开上传各个方向的速度
-        参数：
-            key：pygame事件循环中的键事件
+        参数:
+            key: pygame事件循环中的键事件
         """
         if key == pygame.K_UP or key == pygame.K_DOWN:  # set zero forward/backward velocity
             self.for_back_velocity = 0
