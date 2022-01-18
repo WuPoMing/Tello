@@ -2,22 +2,26 @@
 import cv2, time
 import numpy as np
 from djitellopy import Tello
+import csv
 
 # 2. 建立 Tello 物件與 Tello 初始化
 tello = Tello()
 # Tello 進入 SDK Mode
 tello.connect()
-print(tello.get_battery())
+Battery = "Battery: {}%".format(tello.get_battery())
+print(Battery)
 
 # 開啟 Tello 視訊
 tello.streamoff()
 tello.streamon()
+
 # Tello 起飛
 tello.takeoff()
+
 # 送出飛行控制訊號：依據偵測人臉位置調整
 # 例如: 若太低，調整 up值: (0, 0, 10, 0)
-tello.send_rc_control(0, 0, 0, 0)
-time.sleep(2.5)
+# tello.send_rc_control(0, 0, 0, 0)
+# time.sleep(2.5)
 
 # 3. 參數設定
 w, h = 360, 240
@@ -25,6 +29,7 @@ faceAreaRange=[6250, 6850]
 pid = [1.0, 0.5, 0]
 # PID運算紀錄上一次誤差的變數
 pError = 0
+Error = 0
 
 def findFace(img):
     # 將 img 轉為灰階圖片
@@ -57,7 +62,7 @@ def findFace(img):
     else: 
         # 沒有偵測到人臉
         return img, [[0,0], 0]
-    
+
 def traceFace(info, w, pid, pError):
     x, y = info[0]    # 人臉 x,y座標
     area = info[1]    # 人臉大小
@@ -75,19 +80,34 @@ def traceFace(info, w, pid, pError):
     elif area<faceAreaRange[0] and area!=0: fb=20
 
     # 沒偵測到人臉
-    if x==0: speed=0; error=0
+    if x==0:
+        speed=0; error=0
 
     # 調整飛行
     tello.send_rc_control(0, fb, 0, speed)
+    print('x & y:', info[0])
+    print('area: ', area)
+    print('speed:', speed)
+    if info[0] != [0,0]:
+        csvCursor.writerow([info[0], area, speed])
     # error為下一次 PID運算的pError
     return error
 
+file = open('data.csv', 'w')
+csvCursor = csv.writer(file)
+header = ['x & y', 'area', 'speed']
+csvCursor.writerow(header)
+
 while True:
     img = tello.get_frame_read().frame
+    cv2.putText(img, Battery, (5, 720 - 5), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     img = cv2.resize(img, (w, h))
     img, info = findFace(img)
     pError = traceFace(info, w, pid, pError)
+    
+    print('[faceCenters], [faceAreas]', info)
     cv2.imshow('Tello', img)
     if cv2.waitKey(1) & 0xff==27:
         tello.land()
+        tello.end()
         break
