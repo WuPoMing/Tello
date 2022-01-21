@@ -1,5 +1,5 @@
 # 1. 加入 相關 模組
-import cv2, time
+import cv2
 import numpy as np
 from djitellopy import Tello
 
@@ -14,10 +14,11 @@ tello.streamoff()
 tello.streamon()
 # Tello 起飛
 tello.takeoff()
+
 # 送出飛行控制訊號：依據偵測人臉位置調整
 # 例如: 若太低，調整 up值: (0, 0, 10, 0)
-tello.send_rc_control(0, 0, 0, 0)
-time.sleep(2.5)
+# tello.send_rc_control(0, 0, 0, 0)
+# time.sleep(2.5)
 
 # 3. 參數設定
 w, h = 360, 240
